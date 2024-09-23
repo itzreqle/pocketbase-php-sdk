@@ -1,11 +1,11 @@
 <?php
 
-require 'vendor/autoload.php'; 
+require 'vendor/autoload.php';
 
 class PocketBase
 {
-    private $baseUrl;      // Base URL for the PocketBase instance
-    private $collection;   // Current collection being interacted with
+    public $baseUrl;      // Base URL for the PocketBase instance
+    public $collection;   // Current collection being interacted with
     private $token;        // API token for authentication
 
     /**
@@ -27,7 +27,7 @@ class PocketBase
         $this->token = $token ?: $_ENV['POCKETBASE_API_TOKEN'] ?? getenv('POCKETBASE_API_TOKEN');
 
         // Inform the developer if the environment variables are not set
-        if (!$this->baseUrl || !$this->collection) {
+        if (!$this->baseUrl) { //  || !$this->collection
             die("Base URL or Collection not found! Please ensure POCKETBASE_BASE_URL and POCKETBASE_COLLECTION are set in your .env file.\n");
         }
 
@@ -46,10 +46,13 @@ class PocketBase
      * @param array $queryParams Optional query parameters for the request.
      * @return array The response status code and the decoded JSON response.
      */
-    private function sendRequest($method, $endpoint, $data = null, $queryParams = [])
+    public function sendRequest($method, $endpoint, $data = null, $queryParams = [])
     {
         // Construct the full URL for the request
-        $url = "{$this->baseUrl}/api/collections/{$this->collection}/$endpoint";
+        // $url = "{$this->baseUrl}/api/collections/{$this->collection}/$endpoint";
+        // Remove the collection from the URL construction
+        // Handle issues for init and utils urls
+        $url = "{$this->baseUrl}/$endpoint";
 
         // Append query parameters if any are provided
         if (!empty($queryParams)) {
@@ -111,7 +114,7 @@ class PocketBase
     public function generateToken($username, $password)
     {
         // Corrected endpoint for admin authentication (not tied to a collection)
-        $endpoint = "{$this->baseUrl}/api/admins/auth-with-password";
+        $endpoint = "api/admins/auth-with-password";
 
         // Data to be sent in the request
         $data = [
@@ -170,7 +173,8 @@ class PocketBase
         $queryParams['page'] = $page;
         $queryParams['perPage'] = $perPage;
 
-        return $this->sendRequest('GET', 'records', null, $queryParams); // Send GET request for all records
+        $endpoint = "api/collections/{$this->collection}/records";
+        return $this->sendRequest('GET', $endpoint, null, $queryParams); // Send GET request for all records
     }
 
     /**
@@ -182,7 +186,8 @@ class PocketBase
      */
     public function getRecordById($id, $queryParams = [])
     {
-        return $this->sendRequest('GET', "records/$id", null, $queryParams); // Send GET request for a specific record
+        $endpoint = "api/collections/{$this->collection}/records/$id";
+        return $this->sendRequest('GET', $endpoint, null, $queryParams); // Send GET request for a specific record
     }
 
     /**
@@ -193,7 +198,8 @@ class PocketBase
      */
     public function createRecord($data)
     {
-        return $this->sendRequest('POST', 'records', $data); // Send POST request to create a record
+        $endpoint = "api/collections/{$this->collection}/records";
+        return $this->sendRequest('POST', $endpoint, $data); // Send POST request to create a record
     }
 
     /**
@@ -205,7 +211,8 @@ class PocketBase
      */
     public function updateRecord($id, $data)
     {
-        return $this->sendRequest('PATCH', "records/$id", $data); // Send PATCH request to update a record
+        $endpoint = "api/collections/{$this->collection}/records/$id";
+        return $this->sendRequest('PATCH', $endpoint, $data); // Send PATCH request to update a record
     }
 
     /**
@@ -216,6 +223,7 @@ class PocketBase
      */
     public function deleteRecord($id)
     {
-        return $this->sendRequest('DELETE', "records/$id"); // Send DELETE request to remove a record
+        $endpoint = "api/collections/{$this->collection}/records/$id";
+        return $this->sendRequest('DELETE', $endpoint); // Send DELETE request to remove a record
     }
 }
