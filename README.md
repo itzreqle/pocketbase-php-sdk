@@ -25,10 +25,15 @@ This PHP SDK provides an easy way to interact with the PocketBase API, allowing 
    ```bash
    git clone https://github.com/itzreqle/pocketbase-php-sdk.git
    ```
+   
+2. Install the required dependencies using Composer:
+   ```bash
+   composer require vlucas/phpdotenv
+   ```
 
-2. Include the `PocketBase.php` and `PocketBaseUtils.php` files in your project.
+3. Include the `PocketBase.php` and `PocketBaseUtils.php` files in your project.
 
-3. Create a `.env` file in your project root with the following environment variables:
+4. Create a `.env` file in your project root with the following environment variables:
    ```
    POCKETBASE_BASE_URL=https://your-pocketbase-instance.com
    POCKETBASE_COLLECTION=your_collection_name
