@@ -51,7 +51,7 @@ require_once 'init.php';
 require_once 'auth.php';
 require_once 'utils.php';
 
-$pocketbase = new PocketBase();
+$pb = new PocketBase();
 $pbAuth = new PocketBaseAuth();
 $pbUtils = new PocketBaseUtils();
 ```
@@ -74,12 +74,12 @@ $result = $pbAuth->authRefresh();
 ```php
 // Get all records
 $queryParams = ['filter' => 'status=active'];
-$response = $pocketbase->getAllRecords($queryParams, 1, 20);
+$response = $pb->getAllRecords($queryParams, 1, 20);
 print_r($response);
 
 // Get record by ID
 $recordId = 'your-record-id';
-$response = $pocketbase->getRecordById($recordId);
+$response = $pb->getRecordById($recordId);
 print_r($response);
 
 // Create a new record
@@ -87,7 +87,7 @@ $data = [
     'name' => 'New Item',
     'description' => 'A description of the item.'
 ];
-$response = $pocketbase->createRecord($data);
+$response = $pb->createRecord($data);
 print_r($response);
 
 // Update a record
@@ -95,12 +95,12 @@ $recordId = 'your-record-id';
 $data = [
     'name' => 'Updated Item Name'
 ];
-$response = $pocketbase->updateRecord($recordId, $data);
+$response = $pb->updateRecord($recordId, $data);
 print_r($response);
 
 // Delete a record
 $recordId = 'your-record-id';
-$response = $pocketbase->deleteRecord($recordId);
+$response = $pb->deleteRecord($recordId);
 print_r($response);
 ```
 
@@ -108,8 +108,7 @@ print_r($response);
 
 ```php
 // Example of creating a new user
-$pocketBaseUtils = new PocketBaseUtils(); // Ensure you have instantiated your utils class
-$response = $pocketBaseUtils->createUser(
+$response = $pbUtils->createUser(
     'username',
     'email@email.com',
     'password',
@@ -118,7 +117,7 @@ $response = $pocketBaseUtils->createUser(
 );
 
 // Example of updating a user
-$updateResponse = $pocketBaseUtils->updateUser('user_id_here', [
+$updateResponse = $pbUtils->updateUser('user_id_here', [
     'name' => 'New Name',
     'description' => 'Updated description'
 ]);
@@ -142,11 +141,11 @@ $pbAuth->confirmPasswordReset('reset_token', 'new_password', 'new_password_confi
 // Generate a new token
 $username = 'your-username';
 $password = 'your-password';
-$response = $pocketbase->generateToken($username, $password);
+$response = $pb->generateToken($username, $password);
 print_r($response);
 
 // Manually set a new token
-$pocketbase->setToken('your-new-token');
+$pb->setToken('your-new-token');
 ```
 
 ## Error Handling
