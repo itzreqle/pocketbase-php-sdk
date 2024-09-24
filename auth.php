@@ -2,7 +2,7 @@
 
 require_once 'init.php';
 
-class PocketBaseUtils extends PocketBase
+class PocketBaseAuth extends PocketBase
 {
     /**
      * Authenticate with username/email and password for users.
