@@ -31,7 +31,7 @@ This PHP SDK provides an easy way to interact with the PocketBase API, allowing 
    composer require vlucas/phpdotenv
    ```
 
-3. Include the `PocketBase.php` and `PocketBaseUtils.php` files in your project.
+3. Include the `init.php` and `auth.php` with `utils.php` files in your project.
 
 4. Create a `.env` file in your project root with the following environment variables:
    ```
@@ -47,10 +47,12 @@ This PHP SDK provides an easy way to interact with the PocketBase API, allowing 
 You can instantiate the `PocketBase` class by providing the PocketBase instance URL, collection name, and token. If these values are not provided, they will be loaded from the `.env` file.
 
 ```php
-require_once 'PocketBase.php';
-require_once 'PocketBaseUtils.php';
+require_once 'init.php';
+require_once 'auth.php';
+require_once 'utils.php';
 
 $pocketbase = new PocketBase();
+$pbAuth = new PocketBaseAuth();
 $pbUtils = new PocketBaseUtils();
 ```
 
@@ -58,13 +60,13 @@ $pbUtils = new PocketBaseUtils();
 
 ```php
 // Password authentication
-$result = $pbUtils->authWithPassword('user@example.com', 'password123');
+$result = $pbAuth->authWithPassword('user@example.com', 'password123');
 
 // OAuth2 authentication
-$result = $pbUtils->authWithOAuth2Flow(['provider' => 'google']);
+$result = $pbAuth->authWithOAuth2Flow(['provider' => 'google']);
 
 // Refresh authentication
-$result = $pbUtils->authRefresh();
+$result = $pbAuth->authRefresh();
 ```
 
 ### 3. CRUD Operations
@@ -105,17 +107,33 @@ print_r($response);
 ### 4. User Management
 
 ```php
+// Example of creating a new user
+$pocketBaseUtils = new PocketBaseUtils(); // Ensure you have instantiated your utils class
+$response = $pocketBaseUtils->createUser(
+    'username',
+    'email@email.com',
+    'password',
+    'name',
+    'description'
+);
+
+// Example of updating a user
+$updateResponse = $pocketBaseUtils->updateUser('user_id_here', [
+    'name' => 'New Name',
+    'description' => 'Updated description'
+]);
+
 // Request email verification
-$pbUtils->requestVerification('user@example.com');
+$pbAuth->requestVerification('user@example.com');
 
 // Confirm email verification
-$pbUtils->confirmVerification('verification_token');
+$pbAuth->confirmVerification('verification_token');
 
 // Request password reset
-$pbUtils->requestPasswordReset('user@example.com');
+$pbAuth->requestPasswordReset('user@example.com');
 
 // Confirm password reset
-$pbUtils->confirmPasswordReset('reset_token', 'new_password', 'new_password_confirm');
+$pbAuth->confirmPasswordReset('reset_token', 'new_password', 'new_password_confirm');
 ```
 
 ### 5. Generate and Set Token
