@@ -1,62 +1,69 @@
 # PocketBase PHP SDK
 
-This PHP SDK provides an easy way to interact with the PocketBase API, allowing you to manage collections, records, and authentication directly through PHP.
+Welcome to the PocketBase PHP SDK! This SDK simplifies the process of interacting with the PocketBase API, allowing you to manage collections, records, and authentication directly through PHP.
 
-## Features
+## 🚀 Features
 
-- Authentication with PocketBase API using tokens
-- CRUD operations on records in specified collections
-- Dynamic interaction with multiple collections
-- Supports token generation using username and password
-- Optional filtering and pagination support
-- User management (verification, password reset, email change)
-- OAuth2 provider management
-- Customizable request handling
+- **Authentication:** Securely connect with the PocketBase API using tokens.
+- **CRUD Operations:** Create, read, update, and delete records in specified collections.
+- **Dynamic Collections:** Easily interact with multiple collections.
+- **Token Generation:** Generate tokens using username and password.
+- **Filtering & Pagination:** Optional support for filtering and paginating results.
+- **User Management:** Handle user verification, password resets, and email changes.
+- **OAuth2 Provider Management:** Integrate with various OAuth2 providers.
+- **Customizable Requests:** Tailor your request handling to fit your needs.
 
-## Requirements
+## 📋 Requirements
+
+Before you begin, ensure you have the following:
 
 - PHP 7.4 or higher
 - [cURL](https://www.php.net/manual/en/book.curl.php) extension enabled in PHP
 - A valid PocketBase instance URL
 
-## Installation
+## 🔧 Installation
 
-1. Clone this repository or download the source files:
+Follow these steps to install the PocketBase PHP SDK:
+
+1. **Clone the repository or download the source files:**
    ```bash
    git clone https://github.com/itzreqle/pocketbase-php-sdk.git
    ```
-   
-2. Install the required dependencies using Composer:
+
+2. **Install required dependencies using Composer:**
    ```bash
    composer require vlucas/phpdotenv
    ```
 
-3. Include the `init.php` and `auth.php` with `utils.php` files in your project.
+3. **Include the necessary files in your project:**
+   ```php
+   require_once 'init.php';
+   require_once 'auth.php';
+   require_once 'utils.php';
+   ```
 
-4. Create a `.env` file in your project root with the following environment variables:
+4. **Create a `.env` file in your project root with the following environment variables:**
    ```
    POCKETBASE_BASE_URL=https://your-pocketbase-instance.com
    POCKETBASE_COLLECTION=your_collection_name
    POCKETBASE_API_TOKEN=your_api_token
    ```
 
-## Usage
+## 📚 Usage
 
 ### 1. Initialize the SDK
 
-You can instantiate the `PocketBase` class by providing the PocketBase instance URL, collection name, and token. If these values are not provided, they will be loaded from the `.env` file.
+To start using the SDK, instantiate the `PocketBase` class:
 
 ```php
-require_once 'init.php';
-require_once 'auth.php';
-require_once 'utils.php';
-
 $pb = new PocketBase();
 $pbAuth = new PocketBaseAuth();
 $pbUtils = new PocketBaseUtils();
 ```
 
 ### 2. Authentication
+
+Authenticate users with various methods:
 
 ```php
 // Password authentication
@@ -70,6 +77,8 @@ $result = $pbAuth->authRefresh();
 ```
 
 ### 3. CRUD Operations
+
+Manage your records with ease:
 
 ```php
 // Get all records
@@ -92,9 +101,7 @@ print_r($response);
 
 // Update a record
 $recordId = 'your-record-id';
-$data = [
-    'name' => 'Updated Item Name'
-];
+$data = ['name' => 'Updated Item Name'];
 $response = $pb->updateRecord($recordId, $data);
 print_r($response);
 
@@ -106,17 +113,13 @@ print_r($response);
 
 ### 4. User Management
 
-```php
-// Example of creating a new user
-$response = $pbUtils->createUser(
-    'username',
-    'email@email.com',
-    'password',
-    'name',
-    'description'
-);
+Manage user accounts seamlessly:
 
-// Example of updating a user
+```php
+// Create a new user
+$response = $pbUtils->createUser('username', 'email@email.com', 'password', 'name', 'description');
+
+// Update a user
 $updateResponse = $pbUtils->updateUser('user_id_here', [
     'name' => 'New Name',
     'description' => 'Updated description'
@@ -137,6 +140,8 @@ $pbAuth->confirmPasswordReset('reset_token', 'new_password', 'new_password_confi
 
 ### 5. Generate and Set Token
 
+Manage authentication tokens easily:
+
 ```php
 // Generate a new token
 $username = 'your-username';
@@ -148,11 +153,10 @@ print_r($response);
 $pb->setToken('your-new-token');
 ```
 
-## Error Handling
+## ⚠️ Error Handling
 
-All responses from the API are returned as associative arrays, with the status code and the decoded JSON body.
+All API responses are returned as associative arrays, including the status code and decoded JSON body. For example:
 
-Example response:
 ```php
 [
     'statusCode' => 200,
@@ -164,16 +168,16 @@ Example response:
 ]
 ```
 
-In case of errors, the SDK will return an error message and the HTTP status code.
+In case of errors, the SDK will provide an error message along with the HTTP status code.
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions! Feel free to submit a Pull Request to enhance the SDK.
 
-## Support
+## ❓ Support
 
-If you encounter any problems or have any questions, please open an issue on the [GitHub repository](https://github.com/itzreqle/pocketbase-php-sdk/issues).
+If you encounter any issues or have questions, please open an issue on the [GitHub repository](https://github.com/itzreqle/pocketbase-php-sdk/issues).
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License.
