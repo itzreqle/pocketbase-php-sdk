@@ -1,6 +1,6 @@
 <?php
 
-require 'vendor/autoload.php';
+// require 'vendor/autoload.php'; // Not important to use here if you add it to your router
 
 class PocketBase
 {
@@ -23,75 +23,24 @@ class PocketBase
 
         // Load base URL, collection, and token from environment variables if not provided
         $this->baseUrl = $baseUrl ?: rtrim($_ENV['POCKETBASE_BASE_URL'], '/');
-        $this->collection = $collection ?: $_ENV['POCKETBASE_COLLECTION'];
+        $this->collection = $collection ?: $_ENV['POCKETBASE_COLLECTION'] ?? getenv('POCKETBASE_COLLECTION');
         $this->token = $token ?: $_ENV['POCKETBASE_API_TOKEN'] ?? getenv('POCKETBASE_API_TOKEN');
 
         // Inform the developer if the environment variables are not set
-        if (!$this->baseUrl) { //  || !$this->collection
-            die("Base URL or Collection not found! Please ensure POCKETBASE_BASE_URL and POCKETBASE_COLLECTION are set in your .env file.\n");
+        // if (!$this->baseUrl) { //  || !$this->collection
+        //     die("Base URL or Collection not found! Please ensure POCKETBASE_BASE_URL and POCKETBASE_COLLECTION are set in your .env file.\n");
+        // }
+        if (!$this->baseUrl) {
+            throw new \Exception("Base URL not found! Please ensure POCKETBASE_BASE_URL is set.");
         }
 
         // Check if token is available and provide a clear message to the user
+        // if (!$this->token) {
+        //     die("Token not found! Please ensure POCKETBASE_API_TOKEN is set in your .env file.\n");
+        // }
         if (!$this->token) {
-            die("Token not found! Please ensure POCKETBASE_API_TOKEN is set in your .env file.\n");
+            throw new \Exception("Token not found! Please ensure POCKETBASE_API_TOKEN is set.");
         }
-    }
-
-    /**
-     * Function to send cURL requests with token.
-     *
-     * @param string $method The HTTP method (GET, POST, PATCH, DELETE).
-     * @param string $endpoint The API endpoint to send the request to.
-     * @param array|null $data The data to send with the request (for POST and PATCH).
-     * @param array $queryParams Optional query parameters for the request.
-     * @return array The response status code and the decoded JSON response.
-     */
-    public function sendRequest($method, $endpoint, $data = null, $queryParams = [])
-    {
-        // Construct the full URL for the request
-        // $url = "{$this->baseUrl}/api/collections/{$this->collection}/$endpoint";
-        // Remove the collection from the URL construction
-        // Handle issues for init and utils urls
-        $url = "{$this->baseUrl}/$endpoint";
-
-        // Append query parameters if any are provided
-        if (!empty($queryParams)) {
-            $url .= '?' . http_build_query($queryParams);
-        }
-
-        $curl = curl_init($url);  // Initialize cURL session
-
-        // Set headers for the request
-        $headers = ['Content-Type: application/json']; // Set content type to JSON
-        if ($this->token) {
-            $headers[] = 'Authorization: Bearer ' . $this->token; // Add token to headers if available
-        }
-
-        // Set cURL options
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method); // Set HTTP method
-        if ($data) {
-            $jsonData = json_encode($data); // Encode data as JSON
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData); // Set request body for POST/PATCH
-            $headers[] = 'Content-Length: ' . strlen($jsonData); // Set content length
-        }
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); // Return response as a string
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers); // Set the request headers
-
-        // Execute the cURL request and fetch the response
-        $response = curl_exec($curl);
-
-        // Check if cURL executed successfully
-        if (curl_errno($curl)) {
-            $error_msg = curl_error($curl); // Get cURL error message
-            curl_close($curl);
-            return ['statusCode' => 500, 'response' => ['error' => "cURL error: $error_msg"]]; // Handle cURL errors gracefully
-        }
-
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE); // Get HTTP response code
-        curl_close($curl); // Close cURL session
-
-        // Return the response status code and the decoded JSON
-        return ['statusCode' => $httpCode, 'response' => json_decode($response, true)];
     }
 
     /**
@@ -157,6 +106,64 @@ class PocketBase
             echo "Error generating token: " . json_encode($decodedResponse) . "\n";
             return $decodedResponse; // Return error response if token generation failed
         }
+    }
+
+    /**
+     * Function to send cURL requests with token.
+     *
+     * @param string $method The HTTP method (GET, POST, PATCH, DELETE).
+     * @param string $endpoint The API endpoint to send the request to.
+     * @param array|null $data The data to send with the request (for POST and PATCH).
+     * @param array $queryParams Optional query parameters for the request.
+     * @return array The response status code and the decoded JSON response.
+     */
+    public function sendRequest($method, $endpoint, $data = null, $queryParams = [])
+    {
+        // Construct the full URL for the request
+        // $url = "{$this->baseUrl}/api/collections/{$this->collection}/$endpoint";
+        // Remove the collection from the URL construction
+        // Handle issues for init and utils urls
+        $url = "{$this->baseUrl}/$endpoint";
+
+        // Append query parameters if any are provided
+        if (!empty($queryParams)) {
+            $url .= '?' . http_build_query($queryParams);
+        }
+
+        $curl = curl_init($url);  // Initialize cURL session
+
+        // Set headers for the request
+        $headers = ['Content-Type: application/json']; // Set content type to JSON
+        if ($this->token) {
+            $headers[] = 'Authorization: Bearer ' . $this->token; // Add token to headers if available
+        }
+
+        // Set cURL options
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method); // Set HTTP method
+        if ($data) {
+            $jsonData = json_encode($data); // Encode data as JSON
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData); // Set request body for POST/PATCH
+            $headers[] = 'Content-Length: ' . strlen($jsonData); // Set content length
+        }
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); // Return response as a string
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers); // Set the request headers
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30); // Set timeout to 30 seconds
+
+        // Execute the cURL request and fetch the response
+        $response = curl_exec($curl);
+
+        // Check if cURL executed successfully
+        if (curl_errno($curl)) {
+            $error_msg = curl_error($curl); // Get cURL error message
+            curl_close($curl);
+            return ['statusCode' => 500, 'response' => ['error' => "cURL error: $error_msg"]]; // Handle cURL errors gracefully
+        }
+
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE); // Get HTTP response code
+        curl_close($curl); // Close cURL session
+
+        // Return the response status code and the decoded JSON
+        return ['statusCode' => $httpCode, 'response' => json_decode($response, true)];
     }
 
     /**
